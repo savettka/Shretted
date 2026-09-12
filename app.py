@@ -1,5 +1,5 @@
 """
-Gym Log - a one-person workout tracker built for an iPhone and a free
+Shretted - a one-person workout tracker built for an iPhone and a free
 PythonAnywhere account.
 
 Open it at the gym, it already knows which body part today is. Tap the
@@ -35,6 +35,7 @@ import stats as stats_mod
 from config import (
     BODY_PARTS,
     BODY_PART_COLOURS,
+    BRAND_DEEP,
     DB_PATH,
     HTTPS_ONLY,
     EQUIPMENT,
@@ -64,6 +65,15 @@ app.config.update(
 
 ensure_upload_dir()
 db.init_db()
+
+# Drop your own artwork at static/img/logo.svg (or .png / .jpg / .webp) and the
+# app uses it everywhere in place of the built-in mark. Checked once at start,
+# so adding the file needs a Reload.
+LOGO_FILE = None
+for _name in ("logo.svg", "logo.png", "logo.jpg", "logo.jpeg", "logo.webp"):
+    if os.path.exists(os.path.join(app.static_folder, "img", _name)):
+        LOGO_FILE = "img/" + _name
+        break
 
 MAX_EXERCISES_PER_SESSION = 30
 
@@ -198,6 +208,8 @@ def inject_globals():
         "BODY_PARTS": BODY_PARTS,
         "EQUIPMENT": EQUIPMENT,
         "COLOURS": BODY_PART_COLOURS,
+        "BRAND_DEEP": BRAND_DEEP,
+        "LOGO_FILE": LOGO_FILE,
         "today_body_part": body_part_for(),
         "today_name": DAYS[now_local().weekday()],
         "today_iso": today_local(),
@@ -555,7 +567,6 @@ def stats():
             board=stats_mod.exercise_leaderboard(c, body_part=selected),
             top=stats_mod.top_exercise(c),
             grid=stats_mod.activity_grid(c, weeks=12),
-            months=stats_mod.month_summary(c),
             selected=selected,
         )
     finally:
@@ -853,7 +864,7 @@ def export_csv():
         buffer.getvalue(),
         mimetype="text/csv",
         headers={
-            "Content-Disposition": "attachment; filename=gymlog-"
+            "Content-Disposition": "attachment; filename=shretted-"
             + today_local() + ".csv"
         },
     )
@@ -872,7 +883,7 @@ def backup():
         snapshot,
         mimetype="application/octet-stream",
         headers={
-            "Content-Disposition": "attachment; filename=gymlog-"
+            "Content-Disposition": "attachment; filename=shretted-"
             + today_local() + ".sqlite3",
             "Content-Length": str(len(snapshot)),
         },
@@ -885,15 +896,15 @@ def manifest():
     # window with no way back out.
     response = jsonify(
         {
-            "name": "Gym Log",
-            "short_name": "Gym Log",
+            "name": "Shretted",
+            "short_name": "Shretted",
             "id": "/",
             "start_url": "/",
             "scope": "/",
             "display": "standalone",
             "orientation": "portrait",
-            "background_color": "#0b0f14",
-            "theme_color": "#0b0f14",
+            "background_color": "#F3F2ED",
+            "theme_color": "#F3F2ED",
             "icons": [
                 {
                     "src": url_for("static", filename="img/icon-192.png"),

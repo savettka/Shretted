@@ -1,4 +1,4 @@
-# Putting Gym Log on PythonAnywhere (free account)
+# Putting Shretted on PythonAnywhere (free account)
 
 Start to finish this takes about 20 minutes. You do not need to install
 anything on your laptop and you do not need to know Python.
@@ -213,7 +213,7 @@ Troubleshooting below.
 3. Scroll down and tap **Add to Home Screen**.
 4. Tap **Add**.
 
-You now get a Gym Log icon that opens full screen with no address bar. Log in
+You now get a Shretted icon that opens full screen with no address bar. Log in
 with your PIN once and it stays logged in for a year.
 
 ---

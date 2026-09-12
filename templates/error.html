@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}{{ code }} - Gym Log{% endblock %}
+{% block title %}{{ code }} &middot; Shretted{% endblock %}
 
 {% block content %}
 <div class="empty">
-  <div class="big">{{ '404' if code == 404 else '!' }}</div>
+  <div style="font-size:34px;font-weight:600;color:var(--muted);margin-bottom:12px;">{{ code }}</div>
   {{ message }}<br><br>
   <a href="{{ url_for('home') }}" class="btn btn-ghost">Back to today</a>
 </div>

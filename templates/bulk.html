@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% set active = 'exercises' %}
 {% set body_part = default_bp %}
-{% block title %}Paste a list - Gym Log{% endblock %}
+{% block title %}Paste a list &middot; Shretted{% endblock %}
 
 {% block content %}
 <header class="hdr">
@@ -9,8 +9,7 @@
     <a href="{{ url_for('exercises', bp=default_bp) }}" class="muted">&lsaquo; Exercises</a>
   </div>
   <h1 class="h1 plain">Paste a list</h1>
-  <div class="sub">One exercise per line. Quickest way to set up a body part -
-    photos can come later.</div>
+  <div class="sub">One per line</div>
 </header>
 
 <form method="post">
@@ -35,7 +34,6 @@ Face Pull"></textarea>
   <button class="btn btn-accent btn-block">Add them</button>
 </form>
 
-<p class="muted small center" style="margin-top:12px;">
-  Duplicates are skipped, so you can paste the same list twice safely.
-</p>
+
+
 {% endblock %}

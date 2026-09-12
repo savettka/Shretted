@@ -1,28 +1,28 @@
 {% extends "base.html" %}
 {% from "_macros.html" import eq_icon %}
 {% set active = 'stats' %}
-{% block title %}Stats - Gym Log{% endblock %}
+{% block title %}Stats &middot; Shretted{% endblock %}
 
 {% block content %}
 <header class="hdr">
-  <div class="eyebrow">What you actually did</div>
+  <div class="eyebrow">Shretted</div>
   <h1 class="h1 plain">Stats</h1>
 </header>
 
 <div class="kpis">
-  <div class="kpi">
+  <div class="kpi" style="--i:0;">
     <div class="v">{{ head.total_sessions }}</div>
     <div class="k">sessions logged</div>
   </div>
-  <div class="kpi">
+  <div class="kpi" style="--i:1;">
     <div class="v">{{ head.streak }}</div>
-    <div class="k">day streak{{ ' - keep going' if head.streak > 2 }}</div>
+    <div class="k">day streak</div>
   </div>
-  <div class="kpi">
+  <div class="kpi" style="--i:2;">
     <div class="v">{{ head.this_month }}</div>
     <div class="k">this month</div>
   </div>
-  <div class="kpi">
+  <div class="kpi" style="--i:3;">
     <div class="v">{{ head.avg_per_session }}</div>
     <div class="k">exercises per session</div>
   </div>
@@ -31,14 +31,14 @@
 {% if top %}
   <div class="card" style="margin-top:10px;display:flex;align-items:center;gap:12px;">
     <span class="thumb" style="width:52px;height:52px;border-radius:11px;overflow:hidden;flex:0 0 auto;
-          display:grid;place-items:center;font-weight:800;color:rgba(255,255,255,.85);
-          background:{{ COLOURS.get(top.body_part, '#263141') }};">
+          display:grid;place-items:center;color:#fff;
+          background:{{ COLOURS.get(top.body_part, '#9AA39A') }};">
       {% if top.image %}<img src="{{ url_for('photo', filename=top.image) }}" alt=""
            style="width:100%;height:100%;object-fit:cover;">{% else %}{{ eq_icon(top.equipment) }}{% endif %}
     </span>
     <div style="min-width:0;">
-      <div class="muted small">Your most repeated exercise</div>
-      <div style="font-size:17px;font-weight:700;">{{ top.name }}</div>
+      <div class="muted small">Most repeated</div>
+      <div style="font-size:16.5px;font-weight:550;">{{ top.name }}</div>
       <div class="muted small">{{ top.times_done }} times &middot; last {{ top.days_ago|ago }}</div>
     </div>
   </div>
@@ -55,7 +55,7 @@
         <span class="d {{ 'sched' if cell.scheduled }} {{ 'hit' if cell.body_part }}
                      {{ 'future' if cell.future }} {{ 'today' if cell.today }}"
               title="{{ cell.label }}{{ ' - ' ~ cell.body_part if cell.body_part }}"
-              {% if cell.body_part %}style="background:{{ COLOURS.get(cell.body_part, '#2563eb') }};"{% endif %}
+              {% if cell.body_part %}style="background:{{ COLOURS.get(cell.body_part, '#9AA39A') }};"{% endif %}
         ></span>
       {% endfor %}
     {% endfor %}
@@ -71,7 +71,7 @@
   {% for p in parts %}
     <div class="rank">
       <span style="width:9px;height:9px;border-radius:999px;flex:0 0 auto;
-                   background:{{ COLOURS.get(p.body_part, '#888') }};"></span>
+                   background:{{ COLOURS.get(p.body_part, '#9AA39A') }};"></span>
       <span class="nm">
         {{ p.body_part }}
         <small>&middot; last {{ p.days_ago|ago }}</small>
@@ -102,7 +102,7 @@
         <small>&middot; {{ row.body_part }} &middot; {{ row.days_ago|ago }}</small>
         {% if row.times_done %}
           <span class="meter" style="width: {{ (row.times_done / most * 100)|round(0, 'floor') }}%;
-                background:{{ COLOURS.get(row.body_part, '#2563eb') }};"></span>
+                background:{{ COLOURS.get(row.body_part, '#9AA39A') }};"></span>
         {% endif %}
       </span>
       <span class="ct">{{ row.times_done }}<span>&times;</span></span>
@@ -114,8 +114,8 @@
 
 {% if head.first_session %}
   <p class="muted small center" style="margin-top:14px;">
-    Tracking since {{ head.first_session|long_date }} &middot;
-    {{ head.total_exercises }} exercises logged in total
+    Since {{ head.first_session|long_date }} &middot;
+    {{ head.total_exercises }} exercises logged
   </p>
 {% endif %}
 {% endblock %}

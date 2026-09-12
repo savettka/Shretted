@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 {% set active = 'settings' %}
-{% block title %}More - Gym Log{% endblock %}
+{% block title %}More &middot; Shretted{% endblock %}
 
 {% block content %}
 <header class="hdr">
-  <div class="eyebrow">Gym Log</div>
-  <h1 class="h1 plain">More</h1>
+  <div class="hdr-row" style="align-items:center;">
+    <div>
+      <div class="eyebrow">Shretted</div>
+      <h1 class="h1 plain">More</h1>
+    </div>
+    <div class="brandmark">{% include 'icons/brand.html' %}</div>
+  </div>
 </header>
 
 <div class="section-title">Your week</div>
@@ -13,48 +18,33 @@
   {% for day, part in split %}
     <div class="rank">
       <span class="nm" style="{{ 'color:var(--muted)' if part == 'Rest' }}">{{ day }}</span>
-      <span class="ct" style="font-size:14px;color:{{ COLOURS.get(part, '#8b97a8') }};">{{ part }}</span>
+      <span class="ct" style="font-size:13.5px;font-weight:550;color:{{ COLOURS.get(part, '#8B9088') }};">{{ part }}</span>
     </div>
   {% endfor %}
 </div>
-<p class="muted small" style="margin-top:6px;">
-  To change the split, edit <code>SPLIT</code> in <code>config.py</code> on the
-  server and reload the web app.
-</p>
 
 <div class="section-title">Your data</div>
 <div class="card">
   <div class="rank"><span class="nm">Sessions</span><span class="ct">{{ totals.workouts }}</span></div>
-  <div class="rank"><span class="nm">Exercises in catalogue</span><span class="ct">{{ totals.exercises }}</span></div>
-  <div class="rank"><span class="nm">Photos stored</span><span class="ct">{{ photo_count }}</span></div>
+  <div class="rank"><span class="nm">Exercises</span><span class="ct">{{ totals.exercises }}</span></div>
+  <div class="rank"><span class="nm">Photos</span><span class="ct">{{ photo_count }}</span></div>
   <div class="rank">
-    <span class="nm">Disk used <small>database + photos</small></span>
-    <span class="ct" style="font-size:14px;">{{ (photo_kb + db_kb)|round(0, 'floor')|int }} KB</span>
+    <span class="nm">Storage</span>
+    <span class="ct" style="font-size:13.5px;">{{ (photo_kb + db_kb)|round(0, 'floor')|int }} KB</span>
   </div>
 </div>
 
 <div class="row" style="margin-top:10px;">
   <a class="btn btn-ghost" href="{{ url_for('export_csv') }}">Export CSV</a>
-  <a class="btn btn-ghost" href="{{ url_for('backup') }}">Backup file</a>
-</div>
-<p class="muted small" style="margin-top:8px;">
-  The backup is the entire database in one file. Download it now and then, and
-  keep it somewhere off the server.
-</p>
-
-<div class="section-title">Put it on your home screen</div>
-<div class="card small muted" style="line-height:1.55;">
-  In Safari, tap the <b>Share</b> button, scroll down and choose
-  <b>Add to Home Screen</b>. It then opens full screen with no address bar,
-  exactly like a normal app.
+  <a class="btn btn-ghost" href="{{ url_for('backup') }}">Backup</a>
 </div>
 
 {% if pin_enabled %}
   <div class="spacer"></div>
   <form method="post" action="{{ url_for('logout') }}">
-    <button class="btn btn-ghost btn-block">Lock the app</button>
+    <button class="btn btn-ghost btn-block">Lock</button>
   </form>
 {% endif %}
 
-<p class="muted small center" style="margin-top:18px;">Gym Log</p>
+<p class="tm" style="margin-top:30px;">SHRETTED&trade; &middot; SARVPREET KALRA</p>
 {% endblock %}

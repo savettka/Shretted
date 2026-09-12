@@ -1,0 +1,17 @@
+{# The Shretted mark: an S monogram with a dumbbell through the waist.
+   Inline SVG so it stays crisp at any size and takes its colour from the text
+   around it. To use your own artwork instead, drop a file at
+   static/img/logo.svg (or .png) and the app will pick it up automatically. #}
+<svg class="mark" viewBox="0 0 120 120" fill="none" aria-hidden="true" focusable="false">
+  <path class="mark-s"
+        d="M76 26 H52 a17 17 0 0 0 0 34 h16 a17 17 0 0 1 0 34 H44"
+        stroke="currentColor" stroke-width="10"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <g class="mark-bell" stroke="currentColor" stroke-linecap="round">
+    <path d="M52 60 H68" stroke-width="6"/>
+    <path d="M49 53 V67" stroke-width="7"/>
+    <path d="M71 53 V67" stroke-width="7"/>
+    <path d="M41 56.5 V63.5" stroke-width="5.5"/>
+    <path d="M79 56.5 V63.5" stroke-width="5.5"/>
+  </g>
+</svg>

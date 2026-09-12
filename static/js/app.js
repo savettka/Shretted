@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Gym Log - client side. No framework, no build step, no CDN.
+   Shretted - client side. No framework, no build step, no CDN.
    Everything degrades to plain form posts if this file fails to load.
    ========================================================================== */
 
@@ -98,10 +98,6 @@
         orderInput.value = picked.join(",");
         if (fabCount) fabCount.textContent = String(picked.length);
         if (fabWrap) fabWrap.hidden = picked.length === 0;
-
-        // The "tap them in order" hint has done its job once you have.
-        var hint = $("#hint");
-        if (hint) hint.hidden = picked.length > 0;
 
         store(draftKey, picked.length ? picked.join(",") : null);
       }
@@ -211,9 +207,7 @@
           .then(function (data) {
             var stamp = $(".stamp", step);
             if (stamp) {
-              stamp.textContent = data.done_at
-                ? "Done " + data.clock
-                : (stamp.dataset.idle || "Tap when finished");
+              stamp.textContent = data.done_at ? data.clock : (stamp.dataset.idle || "");
             }
           })
           .catch(function () {

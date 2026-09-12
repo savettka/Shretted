@@ -1,4 +1,4 @@
-# Gym Log dependencies
+# Shretted dependencies
 #
 # Flask is already installed on PythonAnywhere for every Python version, so
 # on a free account you usually only need Pillow.

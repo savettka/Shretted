@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% set active = 'exercises' %}
 {% set body_part = row.body_part if row else default_bp %}
-{% block title %}{{ 'Edit' if row else 'New' }} exercise - Gym Log{% endblock %}
+{% block title %}{{ row.name if row else 'New exercise' }} &middot; Shretted{% endblock %}
 
 {% block content %}
 <header class="hdr">
@@ -17,7 +17,7 @@
   <label class="field">
     <span>Name</span>
     <input type="text" name="name" value="{{ row.name if row else '' }}" maxlength="60"
-           placeholder="e.g. Lat Pulldown" autocapitalize="words" autocomplete="off"
+           placeholder="Lat Pulldown" autocapitalize="words" autocomplete="off"
            enterkeyhint="done" required>
   </label>
 
@@ -41,61 +41,48 @@
       {% endfor %}
     </select>
   </label>
-  <p class="muted small" style="margin:-8px 0 14px;">
-    Only decides which icon the tile shows until you add a photo.
-  </p>
 
   <label class="field">
     <span>Photo</span>
     <label class="filepick">
-      {# No src="" when there is no photo - a browser resolves an empty src to
-         the current page and fetches it again as an image. #}
       <img class="prev" id="preview" alt=""
            {% if row and row.image %}src="{{ url_for('photo', filename=row.image) }}"
            {% else %}hidden{% endif %}>
       {% if not (row and row.image) %}
         <span class="prev" id="preview-blank"
-              style="display:grid;place-items:center;font-weight:800;color:var(--muted);">+</span>
+              style="display:grid;place-items:center;font-size:20px;color:var(--muted);">+</span>
       {% endif %}
       <span class="txt" id="filelabel">
-        {{ 'Tap to replace' if row and row.image else 'Tap to take or choose a photo' }}<br>
-        <span style="opacity:.7;">Cropped square and shrunk automatically</span>
+        {{ 'Replace photo' if row and row.image else 'Take or choose a photo' }}
       </span>
       <input type="file" name="photo" accept="image/*" id="photoinput">
     </label>
   </label>
 
   {% if row and row.image %}
-    <label class="field" style="display:flex;align-items:center;gap:10px;">
+    <label class="field" style="display:flex;align-items:center;gap:11px;">
       <input type="checkbox" name="remove_photo" value="1"
-             style="width:22px;height:22px;flex:0 0 auto;accent-color:var(--danger);">
+             style="width:21px;height:21px;flex:0 0 auto;accent-color:var(--danger);">
       <span style="margin:0;text-transform:none;letter-spacing:0;font-size:14px;
-                   color:var(--text);font-weight:500;">Remove the current photo</span>
+                   color:var(--ink);font-weight:400;">Remove photo</span>
     </label>
   {% endif %}
 
   <label class="field">
-    <span>Note (optional)</span>
+    <span>Note</span>
     <input type="text" name="note" value="{{ row.note or '' if row else '' }}" maxlength="200"
-           placeholder="e.g. wide grip, slow negative" autocomplete="off">
+           placeholder="Wide grip, slow negative" autocomplete="off">
   </label>
 
-  <button class="btn btn-accent btn-block">{{ 'Save changes' if row else 'Add exercise' }}</button>
+  <button class="btn btn-accent btn-block">{{ 'Save' if row else 'Add' }}</button>
 </form>
 
 {% if row %}
   <hr class="sep">
-  {# The name is not interpolated into the confirm string: an apostrophe in
-     something like "Farmer's Walk" would break the inline script and the
-     button would silently stop working. #}
   <form method="post" action="{{ url_for('remove_exercise', exercise_id=row.id) }}"
         data-confirm="Remove this exercise?">
-    <button class="btn btn-danger btn-block">Remove this exercise</button>
+    <button class="btn btn-danger btn-block">Remove</button>
   </form>
-  <p class="muted small center" style="margin-top:8px;">
-    If you have already used it in a session it is hidden rather than deleted,
-    so your history stays intact.
-  </p>
 {% endif %}
 {% endblock %}
 

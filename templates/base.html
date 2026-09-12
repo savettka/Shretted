@@ -2,30 +2,23 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<!-- viewport-fit=cover lets the page paint under the Dynamic Island and the
-     home indicator; the CSS pads content back with safe-area insets. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b0f14">
-<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#F3F2ED">
+<meta name="color-scheme" content="light">
 
-<!-- Add to Home Screen. On iOS 26+ any site can be installed and the manifest
-     only controls quality (name, icon, scope). apple-mobile-web-app-capable is
-     NOT deprecated by Apple and is still what older iOS reads, so keep it. -->
 <link rel="manifest" href="{{ url_for('manifest') }}">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Gym Log">
-<!-- If an apple-touch-icon exists iOS uses it and ignores the manifest icons,
-     so this is the same artwork at Apple's preferred 180px. -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Shretted">
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/icon-180.png') }}">
 <link rel="icon" href="{{ url_for('static', filename='img/icon-192.png') }}">
 
-<title>{% block title %}Gym Log{% endblock %}</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=4">
+<title>{% block title %}Shretted{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=5">
 </head>
 <body data-date="{{ today_iso }}"
-      style="--accent: {{ COLOURS.get(body_part or today_body_part, '#2563eb') }}">
+      style="--accent: {{ COLOURS.get(body_part or today_body_part, BRAND_DEEP) }}">
 
 {% include 'icons/equipment.svg' %}
 
@@ -65,13 +58,12 @@
 </nav>
 {% endif %}
 
-{# iOS has no Vibration API. Toggling a native <input switch> through its label
-   does fire the Taptic Engine, which is the only way to get a real tap on an
-   iPhone from a web page. Hidden, and ignored by browsers that lack it. #}
+{# iOS has no Vibration API. Toggling a native <input switch> through its
+   label does fire the Taptic Engine - the only real tap a web page can get. #}
 <input type="checkbox" switch id="haptic-sw" class="haptic" aria-hidden="true" tabindex="-1">
 <label for="haptic-sw" id="haptic-lb" class="haptic" aria-hidden="true"></label>
 
-<script src="{{ url_for('static', filename='js/app.js') }}?v=4" defer></script>
+<script src="{{ url_for('static', filename='js/app.js') }}?v=5" defer></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

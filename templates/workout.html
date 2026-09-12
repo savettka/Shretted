@@ -2,7 +2,7 @@
 {% from "_macros.html" import eq_icon %}
 {% set active = 'home' %}
 {% set body_part = w.body_part %}
-{% block title %}{{ w.body_part }} {{ w.workout_date|nice_date }} - Gym Log{% endblock %}
+{% block title %}{{ w.body_part }} &middot; Shretted{% endblock %}
 
 {% block content %}
 <header class="hdr">
@@ -30,7 +30,7 @@
     <button type="button" class="step {{ 'done' if item.done_at }}"
             data-item="{{ item.id }}"
             data-url="{{ url_for('toggle_item', workout_id=w.id, item_id=item.id) }}"
-            style="--tint: {{ COLOURS.get(item.body_part, '#263141') }}">
+            style="--tint: {{ COLOURS.get(item.body_part, '#9AA39A') }}; --i: {{ loop.index0 }};">
       <span class="thumb">
         {% if item.image %}
           <img src="{{ url_for('photo', filename=item.image) }}" alt="" loading="lazy">
@@ -42,9 +42,7 @@
         <span class="idx">{{ loop.index }}</span>
         <span class="ttl">{{ item.name }}</span>
         <span class="meta">
-          {# data-idle keeps the original line so un-ticking restores it
-             rather than replacing the coaching note with generic text. #}
-          <span class="stamp" data-idle="{{ item.exercise_note or 'Tap when finished' }}">{% if item.done_at %}Done {{ item.done_at|clock }}{% else %}{{ item.exercise_note or 'Tap when finished' }}{% endif %}</span>
+          <span class="stamp" data-idle="{{ item.exercise_note or '' }}">{% if item.done_at %}{{ item.done_at|clock }}{% else %}{{ item.exercise_note or '' }}{% endif %}</span>
         </span>
       </span>
       <span class="check">&#10003;</span>
@@ -52,17 +50,18 @@
   {% endfor %}
 </div>
 
-<form method="post" action="{{ url_for('workout_note', workout_id=w.id) }}" class="card" style="margin-top:14px;">
+<form method="post" action="{{ url_for('workout_note', workout_id=w.id) }}" style="margin-top:16px;">
   <label class="field" style="margin-bottom:8px;">
-    <span>Session note</span>
+    <span>Note</span>
     <input type="text" name="note" value="{{ w.note or '' }}" maxlength="500"
-           placeholder="Felt strong, went up 5kg on rows..." autocomplete="off">
+           placeholder="Up 5kg on rows" autocomplete="off">
   </label>
   <button class="btn btn-sm btn-ghost btn-block">Save note</button>
 </form>
 
 {% if previous and previous_items %}
-  <details class="recall" style="margin-top:10px;">
+  <div class="spacer"></div>
+  <details class="recall">
     <summary>
       <span>Previous {{ w.body_part }} &middot; <span class="who">{{ previous.workout_date|nice_date }}</span></span>
       <span>{{ previous_items|length }} &#9662;</span>
@@ -80,21 +79,19 @@
 <div class="row">
   <a class="btn btn-ghost" href="{{ url_for('home', new=1) }}">New session</a>
   <form method="post" action="{{ url_for('remove_workout', workout_id=w.id) }}"
-        data-confirm="Delete this whole session?" style="display:flex;">
+        data-confirm="Delete this session?" style="display:flex;">
     <button class="btn btn-danger btn-block">Delete</button>
   </form>
 </div>
-<div class="spacer"></div>
-<div class="spacer"></div>
 {% endblock %}
 
 {% block bottom %}
 <div class="fab-wrap">
   <form method="post" action="{{ url_for('finish', workout_id=w.id) }}">
-    <button class="fab" style="{{ 'background:var(--surface-2)' if w.finished_at }}">
-      {% if w.finished_at %}Reopen session{% else %}
+    <button class="fab" style="{{ 'background:var(--surface-2);color:var(--ink)' if w.finished_at }}">
+      {% if w.finished_at %}Reopen{% else %}
         <span class="n" id="fabcount">{{ done }}/{{ items|length }}</span>
-        <span>Finish workout</span>
+        <span>Finish</span>
       {% endif %}
     </button>
   </form>

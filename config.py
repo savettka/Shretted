@@ -51,16 +51,25 @@ SPLIT = {
 # Order body parts appear in dropdowns / stats.
 BODY_PARTS = ["Back", "Shoulders", "Biceps", "Triceps", "Legs", "Chest"]
 
-# A colour per body part, used for the tile placeholders and headers.
+# A colour per body part. Deliberately desaturated and close in tone so the
+# grid reads as one family next to the sage mark - six bright hues would fight
+# the logo and make the whole thing look like a toy.
+# Each one is dark enough to carry white text at small sizes AND to be read as
+# text on the pale background - both happen, so they all clear about 4.5:1.
 BODY_PART_COLOURS = {
-    "Back":      "#2563eb",
-    "Shoulders": "#7c3aed",
-    "Biceps":    "#db2777",
-    "Triceps":   "#ea580c",
-    "Legs":      "#16a34a",
-    "Chest":     "#dc2626",
-    "Rest":      "#475569",
+    "Back":      "#5F7D5B",   # moss
+    "Shoulders": "#5C7288",   # dusty blue
+    "Biceps":    "#91664A",   # clay
+    "Triceps":   "#77597E",   # plum
+    "Legs":      "#6F7D45",   # olive
+    "Chest":     "#9E5F57",   # terracotta
+    "Rest":      "#6E736C",   # stone
 }
+
+# The mark's own green. BRAND is the light logo sage; BRAND_DEEP is the darker
+# version used wherever it has to carry white text or be read as text.
+BRAND = "#9CB295"
+BRAND_DEEP = "#5A7755"
 
 # --------------------------------------------------------------------------
 # Paths and limits

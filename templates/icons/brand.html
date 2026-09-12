@@ -1,0 +1,2 @@
+{# Your own logo if you have added one, otherwise the built-in mark. #}
+{% if LOGO_FILE %}<img class="mark" src="{{ url_for('static', filename=LOGO_FILE) }}" alt="Shretted">{% else %}{% include 'icons/logo.svg' %}{% endif %}

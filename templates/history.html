@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% set active = 'history' %}
-{% block title %}History - Gym Log{% endblock %}
+{% block title %}History &middot; Shretted{% endblock %}
 
 {% block content %}
 <header class="hdr">
-  <div class="eyebrow">Every session</div>
+  <div class="eyebrow">Shretted</div>
   <h1 class="h1 plain">History</h1>
 </header>
 
@@ -27,7 +27,7 @@
        style="display:block;">
       <div style="display:flex;align-items:center;gap:8px;">
         <span style="width:9px;height:9px;border-radius:999px;flex:0 0 auto;
-                     background:{{ COLOURS.get(w.body_part, '#888') }};"></span>
+                     background:{{ COLOURS.get(w.body_part, '#9AA39A') }};"></span>
         <span style="font-weight:700;font-size:15px;">{{ w.body_part }}</span>
         <span class="muted small">{{ w.workout_date|nice_date }} &middot; {{ w.started_at|clock }}</span>
         <span style="margin-left:auto;" class="muted small">
