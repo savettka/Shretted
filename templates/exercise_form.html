@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% set active = 'exercises' %}
+{% set body_part = row.body_part if row else default_bp %}
+{% block title %}{{ 'Edit' if row else 'New' }} exercise - Gym Log{% endblock %}
+
+{% block content %}
+<header class="hdr">
+  <div class="eyebrow">
+    <a href="{{ url_for('exercises', bp=body_part) }}" class="muted">&lsaquo; Exercises</a>
+  </div>
+  <h1 class="h1 plain">{{ row.name if row else 'New exercise' }}</h1>
+</header>
+
+<form method="post" enctype="multipart/form-data"
+      action="{{ url_for('edit_exercise', exercise_id=row.id) if row else url_for('new_exercise') }}">
+
+  <label class="field">
+    <span>Name</span>
+    <input type="text" name="name" value="{{ row.name if row else '' }}" maxlength="60"
+           placeholder="e.g. Lat Pulldown" autocapitalize="words" autocomplete="off"
+           enterkeyhint="done" required>
+  </label>
+
+  <label class="field">
+    <span>Body part</span>
+    <select name="body_part">
+      {% for part in BODY_PARTS %}
+        <option value="{{ part }}" {{ 'selected' if part == body_part }}>{{ part }}</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <label class="field">
+    <span>Equipment</span>
+    <select name="equipment">
+      {% for kind in EQUIPMENT %}
+        <option value="{{ kind }}"
+                {{ 'selected' if row and row.equipment == kind or (not row and kind == 'other') }}>
+          {{ {'ezbar': 'EZ bar', 'bodyweight': 'Bodyweight'}.get(kind, kind|capitalize) }}
+        </option>
+      {% endfor %}
+    </select>
+  </label>
+  <p class="muted small" style="margin:-8px 0 14px;">
+    Only decides which icon the tile shows until you add a photo.
+  </p>
+
+  <label class="field">
+    <span>Photo</span>
+    <label class="filepick">
+      {# No src="" when there is no photo - a browser resolves an empty src to
+         the current page and fetches it again as an image. #}
+      <img class="prev" id="preview" alt=""
+           {% if row and row.image %}src="{{ url_for('photo', filename=row.image) }}"
+           {% else %}hidden{% endif %}>
+      {% if not (row and row.image) %}
+        <span class="prev" id="preview-blank"
+              style="display:grid;place-items:center;font-weight:800;color:var(--muted);">+</span>
+      {% endif %}
+      <span class="txt" id="filelabel">
+        {{ 'Tap to replace' if row and row.image else 'Tap to take or choose a photo' }}<br>
+        <span style="opacity:.7;">Cropped square and shrunk automatically</span>
+      </span>
+      <input type="file" name="photo" accept="image/*" id="photoinput">
+    </label>
+  </label>
+
+  {% if row and row.image %}
+    <label class="field" style="display:flex;align-items:center;gap:10px;">
+      <input type="checkbox" name="remove_photo" value="1"
+             style="width:22px;height:22px;flex:0 0 auto;accent-color:var(--danger);">
+      <span style="margin:0;text-transform:none;letter-spacing:0;font-size:14px;
+                   color:var(--text);font-weight:500;">Remove the current photo</span>
+    </label>
+  {% endif %}
+
+  <label class="field">
+    <span>Note (optional)</span>
+    <input type="text" name="note" value="{{ row.note or '' if row else '' }}" maxlength="200"
+           placeholder="e.g. wide grip, slow negative" autocomplete="off">
+  </label>
+
+  <button class="btn btn-accent btn-block">{{ 'Save changes' if row else 'Add exercise' }}</button>
+</form>
+
+{% if row %}
+  <hr class="sep">
+  {# The name is not interpolated into the confirm string: an apostrophe in
+     something like "Farmer's Walk" would break the inline script and the
+     button would silently stop working. #}
+  <form method="post" action="{{ url_for('remove_exercise', exercise_id=row.id) }}"
+        data-confirm="Remove this exercise?">
+    <button class="btn btn-danger btn-block">Remove this exercise</button>
+  </form>
+  <p class="muted small center" style="margin-top:8px;">
+    If you have already used it in a session it is hidden rather than deleted,
+    so your history stays intact.
+  </p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>window.GYM_PAGE = 'form';</script>
+{% endblock %}

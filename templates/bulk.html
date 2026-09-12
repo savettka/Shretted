@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% set active = 'exercises' %}
+{% set body_part = default_bp %}
+{% block title %}Paste a list - Gym Log{% endblock %}
+
+{% block content %}
+<header class="hdr">
+  <div class="eyebrow">
+    <a href="{{ url_for('exercises', bp=default_bp) }}" class="muted">&lsaquo; Exercises</a>
+  </div>
+  <h1 class="h1 plain">Paste a list</h1>
+  <div class="sub">One exercise per line. Quickest way to set up a body part -
+    photos can come later.</div>
+</header>
+
+<form method="post">
+  <label class="field">
+    <span>Body part</span>
+    <select name="body_part">
+      {% for part in BODY_PARTS %}
+        <option value="{{ part }}" {{ 'selected' if part == default_bp }}>{{ part }}</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <label class="field">
+    <span>Exercises</span>
+    <textarea name="names" autocapitalize="words" autocomplete="off" spellcheck="false"
+placeholder="Lat Pulldown
+Seated Cable Row
+Barbell Row
+Face Pull"></textarea>
+  </label>
+
+  <button class="btn btn-accent btn-block">Add them</button>
+</form>
+
+<p class="muted small center" style="margin-top:12px;">
+  Duplicates are skipped, so you can paste the same list twice safely.
+</p>
+{% endblock %}

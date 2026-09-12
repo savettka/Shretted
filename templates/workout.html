@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% from "_macros.html" import eq_icon %}
+{% set active = 'home' %}
+{% set body_part = w.body_part %}
+{% block title %}{{ w.body_part }} {{ w.workout_date|nice_date }} - Gym Log{% endblock %}
+
+{% block content %}
+<header class="hdr">
+  <div class="hdr-row">
+    <div>
+      <div class="eyebrow">{{ w.workout_date|nice_date }} &middot; {{ w.started_at|clock }}</div>
+      <h1 class="h1">{{ w.body_part }}</h1>
+      <div class="sub">
+        <span id="donecount">{{ done }} of {{ items|length }} done</span>
+        {%- if w.finished_at %} &middot; finished {{ w.finished_at|clock }}
+        {%- elif is_today %} &middot; <span id="elapsed" data-start="{{ w.started_at }}"></span>
+        {%- endif %}
+      </div>
+    </div>
+    <a class="btn btn-sm btn-ghost" href="{{ url_for('edit_workout', workout_id=w.id) }}">Edit</a>
+  </div>
+</header>
+
+<div class="bar">
+  <i id="progress" style="width: {{ (done / items|length * 100)|round(0, 'floor') if items else 0 }}%"></i>
+</div>
+
+<div id="steps" data-workout="{{ w.id }}">
+  {% for item in items %}
+    <button type="button" class="step {{ 'done' if item.done_at }}"
+            data-item="{{ item.id }}"
+            data-url="{{ url_for('toggle_item', workout_id=w.id, item_id=item.id) }}"
+            style="--tint: {{ COLOURS.get(item.body_part, '#263141') }}">
+      <span class="thumb">
+        {% if item.image %}
+          <img src="{{ url_for('photo', filename=item.image) }}" alt="" loading="lazy">
+        {% else %}
+          {{ eq_icon(item.equipment) }}
+        {% endif %}
+      </span>
+      <span class="body">
+        <span class="idx">{{ loop.index }}</span>
+        <span class="ttl">{{ item.name }}</span>
+        <span class="meta">
+          {# data-idle keeps the original line so un-ticking restores it
+             rather than replacing the coaching note with generic text. #}
+          <span class="stamp" data-idle="{{ item.exercise_note or 'Tap when finished' }}">{% if item.done_at %}Done {{ item.done_at|clock }}{% else %}{{ item.exercise_note or 'Tap when finished' }}{% endif %}</span>
+        </span>
+      </span>
+      <span class="check">&#10003;</span>
+    </button>
+  {% endfor %}
+</div>
+
+<form method="post" action="{{ url_for('workout_note', workout_id=w.id) }}" class="card" style="margin-top:14px;">
+  <label class="field" style="margin-bottom:8px;">
+    <span>Session note</span>
+    <input type="text" name="note" value="{{ w.note or '' }}" maxlength="500"
+           placeholder="Felt strong, went up 5kg on rows..." autocomplete="off">
+  </label>
+  <button class="btn btn-sm btn-ghost btn-block">Save note</button>
+</form>
+
+{% if previous and previous_items %}
+  <details class="recall" style="margin-top:10px;">
+    <summary>
+      <span>Previous {{ w.body_part }} &middot; <span class="who">{{ previous.workout_date|nice_date }}</span></span>
+      <span>{{ previous_items|length }} &#9662;</span>
+    </summary>
+    <div class="body">
+      <ol>
+        {% for item in previous_items %}<li><b>{{ item.name }}</b></li>{% endfor %}
+      </ol>
+    </div>
+  </details>
+{% endif %}
+
+<hr class="sep">
+
+<div class="row">
+  <a class="btn btn-ghost" href="{{ url_for('home', new=1) }}">New session</a>
+  <form method="post" action="{{ url_for('remove_workout', workout_id=w.id) }}"
+        data-confirm="Delete this whole session?" style="display:flex;">
+    <button class="btn btn-danger btn-block">Delete</button>
+  </form>
+</div>
+<div class="spacer"></div>
+<div class="spacer"></div>
+{% endblock %}
+
+{% block bottom %}
+<div class="fab-wrap">
+  <form method="post" action="{{ url_for('finish', workout_id=w.id) }}">
+    <button class="fab" style="{{ 'background:var(--surface-2)' if w.finished_at }}">
+      {% if w.finished_at %}Reopen session{% else %}
+        <span class="n" id="fabcount">{{ done }}/{{ items|length }}</span>
+        <span>Finish workout</span>
+      {% endif %}
+    </button>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>window.GYM_PAGE = 'session';</script>
+{% endblock %}

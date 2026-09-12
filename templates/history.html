@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% set active = 'history' %}
+{% block title %}History - Gym Log{% endblock %}
+
+{% block content %}
+<header class="hdr">
+  <div class="eyebrow">Every session</div>
+  <h1 class="h1 plain">History</h1>
+</header>
+
+{% if not workouts %}
+  <div class="empty">
+    <div class="big">&#128197;</div>
+    Nothing logged yet.<br>
+    Your sessions will build up here.
+  </div>
+{% else %}
+  {% set ns = namespace(month='') %}
+  {% for w in workouts %}
+    {% set this_month = w.workout_date[:7] %}
+    {% if this_month != ns.month %}
+      {% set ns.month = this_month %}
+      <div class="section-title">{{ this_month|month_name }}</div>
+    {% endif %}
+
+    <a class="card card-tight" href="{{ url_for('workout', workout_id=w.id) }}"
+       style="display:block;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="width:9px;height:9px;border-radius:999px;flex:0 0 auto;
+                     background:{{ COLOURS.get(w.body_part, '#888') }};"></span>
+        <span style="font-weight:700;font-size:15px;">{{ w.body_part }}</span>
+        <span class="muted small">{{ w.workout_date|nice_date }} &middot; {{ w.started_at|clock }}</span>
+        <span style="margin-left:auto;" class="muted small">
+          {{ w.done_count or 0 }}/{{ w.exercise_count }}
+        </span>
+      </div>
+      <div class="muted small" style="margin-top:5px;line-height:1.35;">
+        {{ summaries[w.id]|join(' · ') }}
+      </div>
+      {% if w.note %}
+        <div class="small" style="margin-top:5px;color:var(--accent);">&ldquo;{{ w.note }}&rdquo;</div>
+      {% endif %}
+    </a>
+  {% endfor %}
+{% endif %}
+{% endblock %}

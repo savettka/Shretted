@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} - Gym Log{% endblock %}
+
+{% block content %}
+<div class="empty">
+  <div class="big">{{ '404' if code == 404 else '!' }}</div>
+  {{ message }}<br><br>
+  <a href="{{ url_for('home') }}" class="btn btn-ghost">Back to today</a>
+</div>
+{% endblock %}

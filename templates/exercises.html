@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% from "_macros.html" import eq_icon %}
+{% set active = 'exercises' %}
+{% set body_part = selected %}
+{% block title %}{{ selected }} exercises - Gym Log{% endblock %}
+
+{% block content %}
+<header class="hdr">
+  <div class="eyebrow">Your catalogue</div>
+  <h1 class="h1 plain">Exercises</h1>
+  <div class="sub">Tap one to rename it or add a photo. The order here is the
+    order the tiles appear on the home screen.</div>
+</header>
+
+<div class="chiprow">
+  {% for part in BODY_PARTS %}
+    <a class="chip {{ 'on' if selected == part }}" href="{{ url_for('exercises', bp=part) }}"
+       style="{{ 'background:' ~ COLOURS[part] ~ ';box-shadow:none;color:#fff' if selected == part }}">
+      {{ part }}
+    </a>
+  {% endfor %}
+</div>
+
+<div class="row" style="margin-bottom:12px;">
+  <a class="btn btn-accent" href="{{ url_for('new_exercise', bp=selected) }}">+ Add one</a>
+  <a class="btn btn-ghost" href="{{ url_for('bulk_add', bp=selected) }}">Paste a list</a>
+</div>
+
+<div class="card">
+  {% for e in rows %}
+    <div class="mrow {{ 'archived' if e.archived }}">
+      <span class="thumb" style="--tint: {{ COLOURS.get(e.body_part, '#263141') }};
+            background: {{ COLOURS.get(e.body_part, '#263141') }};">
+        {% if e.image %}
+          <img src="{{ url_for('photo', filename=e.image) }}" alt="" loading="lazy">
+        {% else %}{{ eq_icon(e.equipment) }}{% endif %}
+      </span>
+
+      <a class="nm" href="{{ url_for('edit_exercise', exercise_id=e.id) }}">
+        {{ e.name }}{% if e.archived %} <span class="muted">(hidden)</span>{% endif %}
+        <small>
+          done {{ e.times_done }}&times;{% if not e.image %} &middot; no photo yet{% endif %}
+        </small>
+      </a>
+
+      {% if not e.archived %}
+        <span class="arrows">
+          <form method="post" action="{{ url_for('move_exercise', exercise_id=e.id) }}">
+            <input type="hidden" name="dir" value="up">
+            <button aria-label="Move up" {{ 'disabled' if loop.first }}>&#9650;</button>
+          </form>
+          <form method="post" action="{{ url_for('move_exercise', exercise_id=e.id) }}">
+            <input type="hidden" name="dir" value="down">
+            <button aria-label="Move down" {{ 'disabled' if loop.last }}>&#9660;</button>
+          </form>
+        </span>
+      {% else %}
+        <form method="post" action="{{ url_for('restore_exercise', exercise_id=e.id) }}">
+          <button class="btn btn-sm btn-ghost">Unhide</button>
+        </form>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="muted small center" style="padding:20px 0;">
+      Nothing here yet. Add your first {{ selected|lower }} exercise.
+    </div>
+  {% endfor %}
+</div>
+
+<p class="muted small center" style="margin-top:14px;">
+  {{ rows|selectattr('archived', 'equalto', 0)|list|length }} active in {{ selected }}
+</p>
+{% endblock %}

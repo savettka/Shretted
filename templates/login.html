@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% set show_nav = false %}
+{% block title %}Unlock - Gym Log{% endblock %}
+{% block page_class %}login{% endblock %}
+
+{% block content %}
+<div class="box">
+  <div style="font-size:44px;line-height:1;">&#127947;</div>
+  <h1 class="h1 plain" style="margin-top:10px;">Gym Log</h1>
+  <p class="muted small">{{ error if error else 'Enter your PIN' }}</p>
+
+  <form method="post" id="pinform">
+    {# A real input, not a hidden one: if the stylesheet or script fails to
+       load you can still type your PIN and get in. app.js turns it into a
+       hidden field as soon as the keypad is live. #}
+    <input type="text" name="pin" id="pinvalue" inputmode="numeric"
+           pattern="[0-9]*" maxlength="12" autocomplete="off"
+           aria-label="PIN" style="text-align:center;letter-spacing:.4em;">
+    <input type="hidden" name="next" value="{{ next }}">
+
+    <div class="pindots" id="dots"></div>
+
+    <div class="pinpad">
+      {% for n in ['1','2','3','4','5','6','7','8','9'] %}
+        <button type="button" data-k="{{ n }}">{{ n }}</button>
+      {% endfor %}
+      <button type="button" data-k="del" aria-label="Delete">&#9003;</button>
+      <button type="button" data-k="0">0</button>
+      <button type="submit" style="background:var(--accent);color:#fff;" aria-label="Unlock">&#8594;</button>
+    </div>
+  </form>
+
+  <p class="muted small" style="margin-top:22px;opacity:.6;">
+    To change it, edit <code>GYM_PIN</code> in your WSGI file, then Reload
+  </p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>window.GYM_PAGE = 'login';</script>
+{% endblock %}

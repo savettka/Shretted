@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% from "_macros.html" import eq_icon %}
+{% set active = 'stats' %}
+{% block title %}Stats - Gym Log{% endblock %}
+
+{% block content %}
+<header class="hdr">
+  <div class="eyebrow">What you actually did</div>
+  <h1 class="h1 plain">Stats</h1>
+</header>
+
+<div class="kpis">
+  <div class="kpi">
+    <div class="v">{{ head.total_sessions }}</div>
+    <div class="k">sessions logged</div>
+  </div>
+  <div class="kpi">
+    <div class="v">{{ head.streak }}</div>
+    <div class="k">day streak{{ ' - keep going' if head.streak > 2 }}</div>
+  </div>
+  <div class="kpi">
+    <div class="v">{{ head.this_month }}</div>
+    <div class="k">this month</div>
+  </div>
+  <div class="kpi">
+    <div class="v">{{ head.avg_per_session }}</div>
+    <div class="k">exercises per session</div>
+  </div>
+</div>
+
+{% if top %}
+  <div class="card" style="margin-top:10px;display:flex;align-items:center;gap:12px;">
+    <span class="thumb" style="width:52px;height:52px;border-radius:11px;overflow:hidden;flex:0 0 auto;
+          display:grid;place-items:center;font-weight:800;color:rgba(255,255,255,.85);
+          background:{{ COLOURS.get(top.body_part, '#263141') }};">
+      {% if top.image %}<img src="{{ url_for('photo', filename=top.image) }}" alt=""
+           style="width:100%;height:100%;object-fit:cover;">{% else %}{{ eq_icon(top.equipment) }}{% endif %}
+    </span>
+    <div style="min-width:0;">
+      <div class="muted small">Your most repeated exercise</div>
+      <div style="font-size:17px;font-weight:700;">{{ top.name }}</div>
+      <div class="muted small">{{ top.times_done }} times &middot; last {{ top.days_ago|ago }}</div>
+    </div>
+  </div>
+{% endif %}
+
+<div class="section-title">Last 12 weeks</div>
+<div class="card">
+  <div class="heat-days">
+    <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+  </div>
+  <div class="heat">
+    {% for week in grid %}
+      {% for cell in week %}
+        <span class="d {{ 'sched' if cell.scheduled }} {{ 'hit' if cell.body_part }}
+                     {{ 'future' if cell.future }} {{ 'today' if cell.today }}"
+              title="{{ cell.label }}{{ ' - ' ~ cell.body_part if cell.body_part }}"
+              {% if cell.body_part %}style="background:{{ COLOURS.get(cell.body_part, '#2563eb') }};"{% endif %}
+        ></span>
+      {% endfor %}
+    {% endfor %}
+  </div>
+  <div class="heat-legend">
+    <span>&#9632; trained</span>
+    <span style="opacity:.6;">&#9632; scheduled, missed</span>
+  </div>
+</div>
+
+<div class="section-title">By body part</div>
+<div class="card">
+  {% for p in parts %}
+    <div class="rank">
+      <span style="width:9px;height:9px;border-radius:999px;flex:0 0 auto;
+                   background:{{ COLOURS.get(p.body_part, '#888') }};"></span>
+      <span class="nm">
+        {{ p.body_part }}
+        <small>&middot; last {{ p.days_ago|ago }}</small>
+      </span>
+      <span class="ct">{{ p.sessions }}<span>&times;</span></span>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="section-title">Every exercise</div>
+<div class="chiprow">
+  <a class="chip {{ 'on' if not selected }}" href="{{ url_for('stats') }}">All</a>
+  {% for part in BODY_PARTS %}
+    <a class="chip {{ 'on' if selected == part }}" href="{{ url_for('stats', bp=part) }}"
+       style="{{ 'background:' ~ COLOURS[part] ~ ';box-shadow:none;color:#fff' if selected == part }}">
+      {{ part }}
+    </a>
+  {% endfor %}
+</div>
+
+<div class="card">
+  {% set most = board[0].times_done if board and board[0].times_done else 1 %}
+  {% for row in board %}
+    <div class="rank {{ 'zero' if not row.times_done }}">
+      <span class="pos">{{ loop.index }}</span>
+      <span class="nm">
+        {{ row.name }}{% if row.archived %} <small>(hidden)</small>{% endif %}
+        <small>&middot; {{ row.body_part }} &middot; {{ row.days_ago|ago }}</small>
+        {% if row.times_done %}
+          <span class="meter" style="width: {{ (row.times_done / most * 100)|round(0, 'floor') }}%;
+                background:{{ COLOURS.get(row.body_part, '#2563eb') }};"></span>
+        {% endif %}
+      </span>
+      <span class="ct">{{ row.times_done }}<span>&times;</span></span>
+    </div>
+  {% else %}
+    <div class="muted small center">No exercises yet.</div>
+  {% endfor %}
+</div>
+
+{% if head.first_session %}
+  <p class="muted small center" style="margin-top:14px;">
+    Tracking since {{ head.first_session|long_date }} &middot;
+    {{ head.total_exercises }} exercises logged in total
+  </p>
+{% endif %}
+{% endblock %}

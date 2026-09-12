@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% from "_macros.html" import eq_icon %}
+{% set active = 'home' %}
+{% set editing = edit_workout is not none %}
+{% block title %}{{ body_part }} - Gym Log{% endblock %}
+
+{% block content %}
+<header class="hdr">
+  <div class="hdr-row">
+    <div>
+      <div class="eyebrow">
+        {% if editing %}Editing {{ edit_workout.workout_date|nice_date }}
+        {% else %}{{ today_name }}{% endif %}
+      </div>
+      <h1 class="h1">{{ 'Rest day' if is_rest_day else body_part }}</h1>
+      {% if is_override and not is_rest_day %}
+        <div class="sub">Swapped in - {{ scheduled }} was scheduled today</div>
+      {% elif not is_rest_day %}
+        <div class="sub" id="hint">Tap them in the order you will train them</div>
+      {% endif %}
+    </div>
+    {% if not is_rest_day %}
+      <button type="button" class="btn btn-sm btn-ghost" id="density" aria-label="Change tile size">
+        <span id="density-label">3</span>&#9633;
+      </button>
+    {% endif %}
+  </div>
+</header>
+
+{% if is_rest_day %}
+  <div class="card">
+    <p style="margin:0 0 4px;font-size:17px;font-weight:650;">Nothing scheduled today.</p>
+    <p class="muted small" style="margin:0;">Training anyway? Pick a body part below.</p>
+  </div>
+{% endif %}
+
+{# Swap to a different body part - useful when the gym is busy or you shift a day #}
+<div class="chiprow">
+  {% for part in BODY_PARTS %}
+    <a class="chip {{ 'on' if part == body_part and not is_rest_day }}"
+       href="{% if editing %}{{ url_for('edit_workout', workout_id=edit_workout.id, bp=part) }}{% else %}{{ url_for('home', bp=part) }}{% endif %}"
+       style="{{ 'background:' ~ COLOURS[part] ~ ';box-shadow:none;color:#fff' if part == body_part and not is_rest_day }}">
+      {{ part }}
+    </a>
+  {% endfor %}
+</div>
+
+{% if existing %}
+  <a class="card card-tight" style="display:flex;align-items:center;justify-content:space-between;gap:10px;"
+     href="{{ url_for('workout', workout_id=existing.id) }}">
+    <span class="small">You already logged {{ existing.body_part }} today.</span>
+    <span class="small" style="color:var(--accent);font-weight:700;">Open &rsaquo;</span>
+  </a>
+{% endif %}
+
+{% if exercises %}
+  <div class="grid" id="grid" data-preselect="{{ preselected|join(',') }}">
+    {% for e in exercises %}
+      <button type="button" class="tile" data-id="{{ e.id }}" data-name="{{ e.name }}"
+              aria-pressed="false" aria-label="{{ e.name }}"
+              style="--tint: {{ COLOURS.get(e.body_part, '#263141') }}">
+        {% if e.image %}
+          <img src="{{ url_for('photo', filename=e.image) }}" alt="" loading="lazy" decoding="async">
+        {% else %}
+          <span class="ph">{{ eq_icon(e.equipment) }}</span>
+        {% endif %}
+        {% if e.times_done %}<span class="count">{{ e.times_done }}</span>{% endif %}
+        <span class="order"></span>
+        <span class="name">{{ e.name }}</span>
+      </button>
+    {% endfor %}
+  </div>
+
+  {# Last time's session sits BELOW the grid on purpose: it is a reference,
+     not the thing you came here to do, and above the grid it cost a whole
+     row of tiles. #}
+  {% if previous and previous_items %}
+    <div class="spacer"></div>
+    <details class="recall">
+      <summary>
+        <span>Last {{ body_part }} &middot; <span class="who">{{ previous.workout_date|nice_date }}</span></span>
+        <span>{{ previous_items|length }} exercises &#9662;</span>
+      </summary>
+      <div class="body">
+        <ol>
+          {% for item in previous_items %}
+            <li><b>{{ item.name }}</b>{% if item.done_at %} <span class="muted">{{ item.done_at|clock }}</span>{% endif %}</li>
+          {% endfor %}
+        </ol>
+        <button type="button" class="btn btn-sm btn-ghost" style="margin-top:10px;"
+                data-repeat="{{ previous_items|map(attribute='exercise_id')|join(',') }}">
+          Repeat this session
+        </button>
+      </div>
+    </details>
+  {% endif %}
+
+  <div class="spacer"></div>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('new_exercise', bp=body_part) }}">
+    + Add a {{ body_part|lower }} exercise
+  </a>
+
+{% elif not is_rest_day %}
+  <div class="empty">
+    <div class="big">&#127947;</div>
+    No {{ body_part|lower }} exercises yet.<br>
+    <a href="{{ url_for('bulk_add', bp=body_part) }}" style="color:var(--accent);font-weight:650;">
+      Add some now
+    </a>
+  </div>
+{% endif %}
+
+<form method="post" id="pickform"
+      action="{% if editing %}{{ url_for('save_edited_workout', workout_id=edit_workout.id) }}{% else %}{{ url_for('create_workout') }}{% endif %}">
+  <input type="hidden" name="order" id="order" value="">
+  <input type="hidden" name="body_part" value="{{ body_part }}">
+</form>
+{% endblock %}
+
+{% block bottom %}
+<div class="fab-wrap" id="fabwrap" hidden>
+  <button type="submit" form="pickform" class="fab" id="fab">
+    <span class="n" id="fabcount">0</span>
+    <span>{{ 'Save changes' if editing else 'Start workout' }}</span>
+  </button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>window.GYM_PAGE = 'picker';</script>
+{% endblock %}

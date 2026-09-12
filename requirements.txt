@@ -1,0 +1,13 @@
+# Gym Log dependencies
+#
+# Flask is already installed on PythonAnywhere for every Python version, so
+# on a free account you usually only need Pillow.
+
+Flask>=2.3
+Pillow>=10.0
+
+# Recommended. iOS Safari converts HEIC to JPEG when you pick a photo from the
+# photo library, but NOT when you pick one through Browse / Files - that path
+# sends a raw .heic the server cannot otherwise read. Prebuilt wheel, ~20 MB:
+#     pip3.13 install --user --no-cache-dir pillow-heif
+# pillow-heif>=1.0

@@ -1,0 +1,12 @@
+# The database and the photos are your data, not code.
+gymlog.sqlite3
+gymlog.sqlite3-journal
+uploads/*
+!uploads/.gitkeep
+static/img/icon-*.png
+
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
