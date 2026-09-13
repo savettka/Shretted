@@ -57,7 +57,7 @@
               aria-pressed="false" aria-label="{{ e.name }}"
               style="--tint: {{ COLOURS.get(e.body_part, '#9AA39A') }}; --i: {{ loop.index0 }};">
         {% if e.image %}
-          <img src="{{ url_for('photo', filename=e.image) }}" alt="" loading="lazy" decoding="async">
+          <img src="{{ url_for('photo', filename=e.image) }}" alt="" decoding="async" fetchpriority="high">
         {% else %}
           <span class="ph">{{ eq_icon(e.equipment) }}</span>
         {% endif %}

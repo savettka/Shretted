@@ -61,6 +61,11 @@ app.config.update(
     # never travel in clear. Turned off automatically for local development,
     # where there is no certificate.
     SESSION_COOKIE_SECURE=HTTPS_ONLY,
+    # Cache CSS/JS/icons for a year. Flask's default is no-cache, which makes
+    # the phone revalidate every file on every page load - and over a
+    # transatlantic link that is a round trip per file, per screen. Safe here
+    # because every asset URL carries a ?v= that changes when the file does.
+    SEND_FILE_MAX_AGE_DEFAULT=31536000,
 )
 
 ensure_upload_dir()
@@ -101,10 +106,15 @@ def require_pin():
 
 
 @app.after_request
-def no_store_html(response):
-    """Stop iOS Safari showing a stale page when you come back to the tab."""
+def fresh_html(response):
+    """Always revalidate a page, but never forbid storing it.
+
+    "no-store" would also disable Safari's back-forward cache, which is what
+    makes the back gesture instant - without it every Back costs a full round
+    trip. "no-cache" still guarantees you never see a stale workout.
+    """
     if response.mimetype == "text/html":
-        response.headers["Cache-Control"] = "no-store, must-revalidate"
+        response.headers["Cache-Control"] = "no-cache, private"
     return response
 
 

@@ -47,6 +47,22 @@
     if (canSwitch && hapticLabel) { try { hapticLabel.click(); } catch (e) {} }
   }
 
+  /* Instant tab feedback ------------------------------------------------
+
+     Every screen is a full page load, and the server is a long way away. The
+     wait is unavoidable, but a tab that does not react until the new page
+     arrives feels broken. Light it up the moment you touch it. */
+
+  var tabbar = $(".tabbar");
+  if (tabbar) {
+    tabbar.addEventListener("touchstart", function (ev) {
+      var link = ev.target.closest && ev.target.closest("a");
+      if (!link || link.classList.contains("on")) return;
+      $$("a", tabbar).forEach(function (a) { a.classList.remove("on"); });
+      link.classList.add("on");
+    }, { passive: true });
+  }
+
   /* Confirm destructive form submits ----------------------------------- */
 
   document.addEventListener("submit", function (ev) {
