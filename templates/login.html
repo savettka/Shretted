@@ -6,34 +6,38 @@
 {% block content %}
 <div class="box">
   <div class="mark-intro">{% include 'icons/brand.html' %}</div>
-  <h1 class="wordmark" style="margin:16px 0 0;">Shretted</h1>
-  <p class="muted small" style="margin-top:14px;">{{ error if error else '' }}</p>
+  <h1 class="wordmark" style="margin:16px 0 22px;">Shretted</h1>
 
-  <form method="post" id="pinform">
-    {# A real input, not a hidden one: if the script fails to load you can
-       still type your PIN and get in. app.js hides it once the pad is live. #}
-    <input type="text" name="pin" id="pinvalue" inputmode="numeric"
-           pattern="[0-9]*" maxlength="12" autocomplete="off"
-           aria-label="PIN" style="text-align:center;letter-spacing:.4em;">
+  {% if error %}<p class="authnote error">{{ error }}</p>{% endif %}
+
+  <form method="post" style="text-align:left;">
     <input type="hidden" name="next" value="{{ next }}">
 
-    <div class="pindots" id="dots"></div>
+    <label class="field">
+      <span>Email</span>
+      <input type="email" name="email" value="{{ email }}" autocomplete="username"
+             inputmode="email" autocapitalize="none" spellcheck="false"
+             enterkeyhint="next" required autofocus>
+    </label>
 
-    <div class="pinpad">
-      {% for n in ['1','2','3','4','5','6','7','8','9'] %}
-        <button type="button" data-k="{{ n }}">{{ n }}</button>
-      {% endfor %}
-      <button type="button" data-k="del" aria-label="Delete">&#9003;</button>
-      <button type="button" data-k="0">0</button>
-      <button type="submit" aria-label="Unlock"
-              style="background:var(--brand-deep);color:#fff;box-shadow:none;">&#8594;</button>
-    </div>
+    <label class="field">
+      <span>Password</span>
+      <input type="password" name="password" autocomplete="current-password"
+             enterkeyhint="go" required>
+    </label>
+
+    <button class="btn btn-accent btn-block"
+            style="background:var(--brand-deep);">Log in</button>
   </form>
 
-  <p class="tm" style="margin-top:34px;">SHRETTED&trade; &middot; SARVPREET KALRA</p>
-</div>
-{% endblock %}
+  {% if can_signup %}
+    <p class="muted small" style="margin-top:20px;">
+      Been given an invite code?
+      <a href="{{ url_for('signup') }}" style="color:var(--brand-deep);font-weight:600;">
+        Create an account</a>
+    </p>
+  {% endif %}
 
-{% block scripts %}
-<script>window.GYM_PAGE = 'login';</script>
+  <p class="tm" style="margin-top:32px;">SHRETTED&trade; &middot; SARVPREET KALRA</p>
+</div>
 {% endblock %}

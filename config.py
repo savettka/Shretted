@@ -18,15 +18,15 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # app would roll over to the next day at midnight UTC instead of midnight here.
 TIMEZONE = os.environ.get("GYM_TZ", "Europe/London")
 
-# The PIN that guards the app. The site sits on a public URL, so leave one set.
+# Who may create an account.
 #
-# DIGITS ONLY, 4 to 12 of them - the unlock screen is a numeric keypad, so a
-# PIN containing letters could never be typed in. Set to "" to remove the lock
-# entirely (only sensible if you are running this on your own machine).
+# The very first account is always allowed - that one becomes the owner, and
+# inherits any training history from before accounts existed. After that,
+# signing up requires this code, which you give to the friends you want in.
 #
-# Setting it here works, but on the server set GYM_PIN in the WSGI file
-# instead: that value wins over this one.
-PIN = os.environ.get("GYM_PIN", "1234")
+# Leave it empty and signup closes completely once the owner account exists.
+# Set it in the WSGI file as GYM_INVITE_CODE; that wins over this default.
+INVITE_CODE = os.environ.get("GYM_INVITE_CODE", "")
 
 # Used to sign the login cookie. CHANGE THIS to any long random string.
 # Generate one with:  python3 -c "import secrets; print(secrets.token_hex(32))"
@@ -37,7 +37,9 @@ SECRET_KEY = os.environ.get("GYM_SECRET_KEY", "change-me-to-a-long-random-string
 # plain http, otherwise the browser will discard your login cookie.
 HTTPS_ONLY = os.environ.get("GYM_HTTPS_ONLY", "1") != "0"
 
-# Your weekly split. Key = weekday number (Mon=0 ... Sun=6).
+# The default weekly split handed to each NEW account. Everyone can change
+# their own afterwards under More - changing this does not change theirs.
+# Key = weekday number (Mon=0 ... Sun=6).
 SPLIT = {
     0: "Back",
     1: "Shoulders",
@@ -80,7 +82,7 @@ DB_PATH = os.environ.get("GYM_DB_PATH", os.path.join(BASE_DIR, "gymlog.sqlite3")
 # Deliberately NOT inside static/. On PythonAnywhere you map /static/ straight
 # to the filesystem, which bypasses Flask entirely - anything in there is
 # public and guessable. Your photos go through the /photo/ route instead, which
-# is behind the PIN. Both paths are absolute because a web worker's working
+# behind your login. Both paths are absolute because a web worker's working
 # directory is not reliably your project folder.
 UPLOAD_DIR = os.environ.get("GYM_UPLOAD_DIR", os.path.join(BASE_DIR, "uploads"))
 
@@ -118,7 +120,11 @@ def today_local():
     return now_local().strftime("%Y-%m-%d")
 
 
-def body_part_for(date_obj=None):
-    """The body part scheduled for a given date (defaults to today)."""
+def body_part_for(split=None, date_obj=None):
+    """The body part scheduled for a given date, for a given person's split.
+
+    Pass the user's own split; SPLIT is only the default for new accounts.
+    """
+    split = split or SPLIT
     date_obj = date_obj or now_local()
-    return SPLIT.get(date_obj.weekday(), "Rest")
+    return split.get(date_obj.weekday(), "Rest")

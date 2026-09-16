@@ -15,7 +15,7 @@
 <link rel="icon" href="{{ url_for('static', filename='img/icon-192.png') }}">
 
 <title>{% block title %}Shretted{% endblock %}</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=6">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=7">
 </head>
 <body data-date="{{ today_iso }}"
       style="--accent: {{ COLOURS.get(body_part or today_body_part, BRAND_DEEP) }}">
@@ -63,7 +63,7 @@
 <input type="checkbox" switch id="haptic-sw" class="haptic" aria-hidden="true" tabindex="-1">
 <label for="haptic-sw" id="haptic-lb" class="haptic" aria-hidden="true"></label>
 
-<script src="{{ url_for('static', filename='js/app.js') }}?v=6" defer></script>
+<script src="{{ url_for('static', filename='js/app.js') }}?v=7" defer></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

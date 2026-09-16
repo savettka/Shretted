@@ -143,3 +143,62 @@ generated ones.
 ---
 
 Shretted™ · Sarvpreet Kalra
+
+---
+
+## Accounts
+
+Shretted is multi-user. The **exercise catalogue and photos are shared** by
+everyone; **workouts, stats and history are private** to each person, and each
+person sets their own weekly split.
+
+- The **first account ever created** becomes the owner. It needs no invite
+  code, and it inherits any training logged before accounts existed.
+- Everyone after that needs the **invite code** — set `GYM_INVITE_CODE` in the
+  WSGI file and give it to the people you want in.
+- With no invite code set, sign-ups are closed. That is the default.
+- Only the owner can download the database backup, since it contains
+  everybody's log.
+
+Manage your split, password and app tokens under **More → Account**.
+
+## JSON API
+
+Versioned at `/api/v1`, for a native app to talk to. Get a token:
+
+```bash
+curl -X POST https://shretted.pythonanywhere.com/api/v1/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com","password":"..."}'
+```
+
+Then pass `Authorization: Bearer <token>` on everything else:
+
+| Method | Path | What it does |
+|---|---|---|
+| GET | `/api/v1/me` | the logged-in user |
+| GET | `/api/v1/today` | body part, exercise grid, existing session — one call for the home screen |
+| GET | `/api/v1/exercises` | the shared catalogue |
+| POST | `/api/v1/exercises` | add one |
+| GET | `/api/v1/workouts` | your sessions, newest first |
+| POST | `/api/v1/workouts` | start one: `{"body_part":"Back","exercise_ids":[1,2,3]}` |
+| GET | `/api/v1/workouts/<id>` | one session with its ordered items |
+| PUT | `/api/v1/workouts/<id>/items` | replace the exercise list |
+| POST | `/api/v1/workouts/<id>/items/<item>/toggle` | tick one off |
+| POST | `/api/v1/workouts/<id>/finish` | finish or reopen |
+| PATCH | `/api/v1/workouts/<id>` | change the note or body part |
+| DELETE | `/api/v1/workouts/<id>` | delete a session |
+| GET | `/api/v1/stats` | everything the Stats screen shows |
+
+Tokens never expire. Create and revoke them under **More → Account**, or
+`POST /api/v1/logout` to revoke the one you are using.
+
+## Before you deploy an update
+
+```bash
+python3.13 selftest.py
+```
+
+Runs against a throwaway database — it never touches `gymlog.sqlite3`. It
+checks the app imports, the migration works, and that one person cannot read
+another's workouts. If it fails, do not hit Reload.

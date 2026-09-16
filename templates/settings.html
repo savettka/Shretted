@@ -6,12 +6,18 @@
 <header class="hdr">
   <div class="hdr-row" style="align-items:center;">
     <div>
-      <div class="eyebrow">Shretted</div>
+      <div class="eyebrow">{{ me.name }}</div>
       <h1 class="h1 plain">More</h1>
     </div>
     <div class="brandmark">{% include 'icons/brand.html' %}</div>
   </div>
 </header>
+
+<a class="card card-tight" href="{{ url_for('account') }}"
+   style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+  <span>Account, split and password</span>
+  <span style="color:var(--brand-deep);font-weight:600;">&rsaquo;</span>
+</a>
 
 <div class="section-title">Your week</div>
 <div class="card">
@@ -25,9 +31,10 @@
 
 <div class="section-title">Your data</div>
 <div class="card">
-  <div class="rank"><span class="nm">Sessions</span><span class="ct">{{ totals.workouts }}</span></div>
-  <div class="rank"><span class="nm">Exercises</span><span class="ct">{{ totals.exercises }}</span></div>
-  <div class="rank"><span class="nm">Photos</span><span class="ct">{{ photo_count }}</span></div>
+  <div class="rank"><span class="nm">Your sessions</span><span class="ct">{{ totals.workouts }}</span></div>
+  <div class="rank"><span class="nm">Exercises <small>shared</small></span><span class="ct">{{ totals.exercises }}</span></div>
+  <div class="rank"><span class="nm">People <small>shared</small></span><span class="ct">{{ totals.people }}</span></div>
+  <div class="rank"><span class="nm">Photos <small>shared</small></span><span class="ct">{{ photo_count }}</span></div>
   <div class="rank">
     <span class="nm">Storage</span>
     <span class="ct" style="font-size:13.5px;">{{ (photo_kb + db_kb)|round(0, 'floor')|int }} KB</span>
@@ -36,15 +43,10 @@
 
 <div class="row" style="margin-top:10px;">
   <a class="btn btn-ghost" href="{{ url_for('export_csv') }}">Export CSV</a>
-  <a class="btn btn-ghost" href="{{ url_for('backup') }}">Backup</a>
+  {% if me.is_owner %}
+    <a class="btn btn-ghost" href="{{ url_for('backup') }}">Backup</a>
+  {% endif %}
 </div>
-
-{% if pin_enabled %}
-  <div class="spacer"></div>
-  <form method="post" action="{{ url_for('logout') }}">
-    <button class="btn btn-ghost btn-block">Lock</button>
-  </form>
-{% endif %}
 
 <p class="tm" style="margin-top:30px;">SHRETTED&trade; &middot; SARVPREET KALRA</p>
 {% endblock %}

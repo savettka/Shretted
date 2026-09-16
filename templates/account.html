@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% set active = 'settings' %}
+{% block title %}Account &middot; Shretted{% endblock %}
+
+{% block content %}
+<header class="hdr">
+  <div class="eyebrow">
+    <a href="{{ url_for('settings') }}" class="muted">&lsaquo; More</a>
+  </div>
+  <h1 class="h1 plain">Account</h1>
+  <div class="sub">{{ me.name }} &middot; {{ me.email }}</div>
+</header>
+
+<div class="section-title">Your week</div>
+<form method="post">
+  <input type="hidden" name="action" value="split">
+  <div class="card">
+    {% for day in range(7) %}
+      <div class="rank">
+        <span class="nm">{{ DAYS[day] }}</span>
+        <select name="day{{ day }}" style="width:auto;padding:7px 30px 7px 12px;
+                font-size:14px;border-radius:9px;">
+          <option value="Rest" {{ 'selected' if split.get(day) == 'Rest' }}>Rest</option>
+          {% for part in BODY_PARTS %}
+            <option value="{{ part }}" {{ 'selected' if split.get(day) == part }}>{{ part }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endfor %}
+  </div>
+  <button class="btn btn-ghost btn-block">Save split</button>
+</form>
+
+<div class="section-title">Password</div>
+<form method="post">
+  <input type="hidden" name="action" value="password">
+  <label class="field">
+    <span>Current</span>
+    <input type="password" name="current" autocomplete="current-password" required>
+  </label>
+  <label class="field">
+    <span>New</span>
+    <input type="password" name="new" autocomplete="new-password" minlength="8" required>
+  </label>
+  <button class="btn btn-ghost btn-block">Change password</button>
+</form>
+
+<div class="section-title">iPhone app tokens</div>
+<div class="card">
+  {% for t in tokens %}
+    <div class="rank">
+      <span class="nm">
+        {{ t.label or 'Token' }}
+        <small>added {{ t.created_at|nice_date }} &middot;
+          {% if t.last_used %}used {{ t.last_used|nice_date }}{% else %}never used{% endif %}</small>
+      </span>
+      <form method="post">
+        <input type="hidden" name="action" value="revoke">
+        <input type="hidden" name="hash" value="{{ t.token_hash }}">
+        <button class="btn btn-sm btn-ghost">Revoke</button>
+      </form>
+    </div>
+  {% else %}
+    <div class="muted small center" style="padding:14px 0;">No tokens yet.</div>
+  {% endfor %}
+</div>
+<form method="post" class="row" style="margin-top:8px;">
+  <input type="hidden" name="action" value="token">
+  <input type="text" name="label" placeholder="iPhone" maxlength="40" autocomplete="off">
+  <button class="btn btn-ghost" style="flex:0 0 auto;">New token</button>
+</form>
+<p class="muted small" style="margin-top:8px;">
+  Shown once when created. Only a hash is stored, so a copy of the database
+  gives nobody your account.
+</p>
+
+{% if me.is_owner %}
+  <div class="section-title">People</div>
+  <div class="card">
+    {% for p in people %}
+      <div class="rank">
+        <span class="nm">
+          {{ p.name }}{% if p.is_owner %} <small>owner</small>{% endif %}
+          <small>{{ p.email }}</small>
+        </span>
+        <span class="ct">{{ p.sessions }}<span>&times;</span></span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="card card-tight" style="margin-top:8px;">
+    <div class="muted small">Invite code</div>
+    {% if invite_code %}
+      <div style="font-size:17px;font-weight:600;letter-spacing:.06em;margin-top:4px;">
+        {{ invite_code }}</div>
+      <div class="muted small" style="margin-top:6px;">
+        Give this to anyone you want to let in.</div>
+    {% else %}
+      <div class="muted small" style="margin-top:4px;">
+        Not set, so nobody else can sign up. Add <code>GYM_INVITE_CODE</code>
+        to your WSGI file and Reload.</div>
+    {% endif %}
+  </div>
+{% endif %}
+
+<hr class="sep">
+<form method="post" action="{{ url_for('logout') }}">
+  <button class="btn btn-ghost btn-block">Log out</button>
+</form>
+<div class="spacer"></div>
+{% endblock %}

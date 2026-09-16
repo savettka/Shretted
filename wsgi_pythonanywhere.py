@@ -19,21 +19,23 @@ if project_home not in sys.path:
     sys.path.insert(0, project_home)
 
 # --- 2. Settings ----------------------------------------------------------
-# Setting them here keeps your PIN and secret key out of the code, so they do
-# not end up in a git repo. They override the defaults in config.py.
-# CHANGE THIS. Digits only, 4-12 of them - the unlock screen is a keypad.
-os.environ.setdefault("GYM_PIN", "1234")
+# Kept here rather than in config.py so your secrets never reach a git repo.
 
-# CHANGE THIS TOO. Do not type it by hand; generate one in a Bash console with
+# CHANGE THIS. Do not type it by hand; generate one in a Bash console with
 #     python3.13 -c "import secrets; print(secrets.token_hex(32))"
 # and paste the output between the quotes. A stray " or \ here is a syntax
 # error that takes the whole site down.
 os.environ.setdefault("GYM_SECRET_KEY", "change-me")
 
+# The code your friends need to create an account. The FIRST account ever
+# created does not need it - that one becomes the owner. Leave this empty and
+# nobody else can sign up at all.
+os.environ.setdefault("GYM_INVITE_CODE", "")
+
 os.environ.setdefault("GYM_TZ", "Europe/London")
 
-# The servers run on UTC. The app already uses zoneinfo for anything that
-# matters, but this makes log timestamps read in UK time as well.
+# The servers run on UTC. The app already uses zoneinfo where it matters; this
+# just makes log timestamps read in UK time too.
 os.environ["TZ"] = "Europe/London"
 import time
 time.tzset()
