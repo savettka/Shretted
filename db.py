@@ -22,7 +22,11 @@ import sqlite3
 
 from config import DB_PATH, SPLIT, now_local, today_local
 
-SCHEMA = """
+# Tables and indexes are kept apart on purpose, and run in three steps:
+# tables -> add any missing columns -> indexes. An index on a column that an
+# older database has not got yet would fail, and CREATE TABLE IF NOT EXISTS
+# will not add the column for us because the table already exists.
+TABLES = """
 CREATE TABLE IF NOT EXISTS user (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     name          TEXT    NOT NULL,
@@ -34,8 +38,6 @@ CREATE TABLE IF NOT EXISTS user (
     last_seen     TEXT
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS ux_user_email ON user (email COLLATE NOCASE);
-
 CREATE TABLE IF NOT EXISTS api_token (
     token_hash TEXT    PRIMARY KEY,
     user_id    INTEGER NOT NULL REFERENCES user(id) ON DELETE CASCADE,
@@ -43,8 +45,6 @@ CREATE TABLE IF NOT EXISTS api_token (
     created_at TEXT    NOT NULL,
     last_used  TEXT
 );
-
-CREATE INDEX IF NOT EXISTS ix_token_user ON api_token (user_id);
 
 CREATE TABLE IF NOT EXISTS exercise (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,9 +59,6 @@ CREATE TABLE IF NOT EXISTS exercise (
     created_by  INTEGER REFERENCES user(id) ON DELETE SET NULL
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS ux_exercise_name
-    ON exercise (body_part, name COLLATE NOCASE);
-
 CREATE TABLE IF NOT EXISTS workout (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id      INTEGER REFERENCES user(id) ON DELETE CASCADE,
@@ -72,8 +69,6 @@ CREATE TABLE IF NOT EXISTS workout (
     note         TEXT
 );
 
-CREATE INDEX IF NOT EXISTS ix_workout_user ON workout (user_id, workout_date DESC);
-
 CREATE TABLE IF NOT EXISTS workout_item (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     workout_id  INTEGER NOT NULL REFERENCES workout(id) ON DELETE CASCADE,
@@ -81,7 +76,22 @@ CREATE TABLE IF NOT EXISTS workout_item (
     position    INTEGER NOT NULL,
     done_at     TEXT
 );
+"""
 
+# Columns added after the first release. Each one is (table, column, definition)
+# and is only applied when missing, so this is safe to run on every start.
+ADDED_COLUMNS = [
+    ("workout", "user_id", "INTEGER REFERENCES user(id)"),
+    ("exercise", "created_by", "INTEGER REFERENCES user(id)"),
+]
+
+INDEXES = """
+CREATE UNIQUE INDEX IF NOT EXISTS ux_user_email ON user (email COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS ix_token_user ON api_token (user_id);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_exercise_name
+    ON exercise (body_part, name COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS ix_workout_user ON workout (user_id, workout_date DESC);
+CREATE INDEX IF NOT EXISTS ix_workout_date ON workout (workout_date DESC);
 CREATE INDEX IF NOT EXISTS ix_item_workout  ON workout_item (workout_id, position);
 CREATE INDEX IF NOT EXISTS ix_item_exercise ON workout_item (exercise_id);
 """
@@ -102,19 +112,24 @@ def init_db():
     """Create or migrate the database. Safe to run on every start."""
     conn = get_conn()
     try:
-        conn.executescript(SCHEMA)
+        # 1. Tables. Existing ones are left exactly as they are.
+        conn.executescript(TABLES)
         conn.commit()
 
-        # --- migrate a single-user database from before accounts existed ---
-        # The old schema had no user_id on workout and no created_by on
-        # exercise. Adding a nullable column is non-destructive; the existing
-        # workouts stay orphaned until the first account claims them.
-        if "user_id" not in _columns(conn, "workout"):
-            conn.execute("ALTER TABLE workout ADD COLUMN user_id INTEGER REFERENCES user(id)")
-            conn.commit()
-        if "created_by" not in _columns(conn, "exercise"):
-            conn.execute("ALTER TABLE exercise ADD COLUMN created_by INTEGER REFERENCES user(id)")
-            conn.commit()
+        # 2. Columns added since the first release. A database written by the
+        #    single-user version has no user_id on workout and no created_by
+        #    on exercise. Adding a nullable column is non-destructive - the
+        #    old workouts stay unclaimed until the first account takes them.
+        for table, column, definition in ADDED_COLUMNS:
+            if column not in _columns(conn, table):
+                conn.execute(
+                    "ALTER TABLE " + table + " ADD COLUMN " + column + " " + definition
+                )
+        conn.commit()
+
+        # 3. Indexes, now that every column they mention definitely exists.
+        conn.executescript(INDEXES)
+        conn.commit()
 
         # Seed the starter catalogue exactly once, ever - so deliberately
         # deleting everything does not bring all 84 back on the next restart.
