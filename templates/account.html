@@ -69,10 +69,6 @@
   <input type="text" name="label" placeholder="iPhone" maxlength="40" autocomplete="off">
   <button class="btn btn-ghost" style="flex:0 0 auto;">New token</button>
 </form>
-<p class="muted small" style="margin-top:8px;">
-  Shown once when created. Only a hash is stored, so a copy of the database
-  gives nobody your account.
-</p>
 
 {% if me.is_owner %}
   <div class="section-title">People</div>
@@ -93,12 +89,8 @@
     {% if invite_code %}
       <div style="font-size:17px;font-weight:600;letter-spacing:.06em;margin-top:4px;">
         {{ invite_code }}</div>
-      <div class="muted small" style="margin-top:6px;">
-        Give this to anyone you want to let in.</div>
     {% else %}
-      <div class="muted small" style="margin-top:4px;">
-        Not set, so nobody else can sign up. Add <code>GYM_INVITE_CODE</code>
-        to your WSGI file and Reload.</div>
+      <div class="muted small" style="margin-top:4px;">Not set &mdash; sign-ups closed.</div>
     {% endif %}
   </div>
 {% endif %}

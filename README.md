@@ -1,13 +1,13 @@
 # Shretted
 
-Shretted is a one-person workout tracker, built for an iPhone and a free PythonAnywhere
-account.
+Shretted is a workout tracker for you and a few friends, built for an iPhone
+and a free PythonAnywhere account.
 
 Open it at the gym and it already knows what today is. Tap the exercises your
 trainer gave you, **in the order he gave them**, hit Start, and tick each one
 off as you finish it. Next week it shows you what you did last time.
 
-Live at `https://shretted.pythonanywhere.com` (PIN protected).
+Live at `https://shretted.pythonanywhere.com`. Accounts required - see below.
 
 ---
 
@@ -69,7 +69,10 @@ half of the 512 MB disk quota.
 | File | What it does |
 |---|---|
 | `app.py` | routes, template filters, error handlers |
-| `config.py` | the split, the PIN, timezone, paths, limits |
+| `config.py` | the default split, timezone, paths, limits |
+| `auth.py` | passwords and API tokens |
+| `api.py` | the JSON API for a native app |
+| `selftest.py` | run before deploying an update |
 | `db.py` | SQLite schema and every query |
 | `stats.py` | the Stats page queries |
 | `images.py` | uploads: EXIF rotation, square crop, resize to ~25 KB |
@@ -84,13 +87,13 @@ which override the defaults in `config.py`:
 
 | Variable | Purpose |
 |---|---|
-| `GYM_PIN` | unlock PIN. **Digits only**, 4–12 — the unlock screen is a number pad |
+| `GYM_INVITE_CODE` | the code friends need to sign up. Empty = sign-ups closed |
 | `GYM_SECRET_KEY` | signs the login cookie. Generate with `python3 -c "import secrets; print(secrets.token_hex(32))"` |
 | `GYM_TZ` | `Europe/London`. PythonAnywhere runs on UTC, so without this the day would roll over an hour early for seven months of the year |
 | `GYM_HTTPS_ONLY` | set to `0` only when running locally over plain http |
 
 Photos are stored outside `static/` on purpose and served through the app's
-own `/photo/` route, so they stay behind the PIN rather than being readable by
+own `/photo/` route, so they stay behind a login rather than being readable by
 anyone who guesses a filename.
 
 ## Your data

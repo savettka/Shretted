@@ -632,7 +632,12 @@ label.field > span {
   margin-bottom: 7px;
 }
 
-input[type="text"], input[type="password"], input[type="tel"], select, textarea {
+/* Every text-like input, not a hand-picked list - miss one (email, say) and
+   it silently falls back to the browser's own styling and looks foreign. */
+input[type="text"], input[type="email"], input[type="password"],
+input[type="tel"], input[type="number"], input[type="search"],
+input[type="url"], input[type="date"], input:not([type]),
+select, textarea {
   width: 100%;
   font-size: 16px;              /* below 16 and iOS zooms on focus */
   font-family: inherit;
@@ -656,7 +661,9 @@ select {
   background-repeat: no-repeat;
 }
 
-input:focus, select:focus, textarea:focus {
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus,
+input[type="tel"]:focus, input[type="number"]:focus, input[type="search"]:focus,
+input[type="url"]:focus, input[type="date"]:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--brand);
   box-shadow: 0 0 0 3px var(--brand-wash);

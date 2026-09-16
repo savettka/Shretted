@@ -31,10 +31,8 @@
   </form>
 
   {% if can_signup %}
-    <p class="muted small" style="margin-top:20px;">
-      Been given an invite code?
-      <a href="{{ url_for('signup') }}" style="color:var(--brand-deep);font-weight:600;">
-        Create an account</a>
+    <p class="muted small" style="margin-top:22px;">
+      <a href="{{ url_for('signup') }}" style="color:var(--brand-deep);font-weight:600;">Create an account</a>
     </p>
   {% endif %}
 

@@ -10,16 +10,12 @@
 
   {% if closed %}
     <p class="authnote">Sign-ups are closed.</p>
-    <p class="muted small">Ask the owner for an invite code.</p>
     <a class="btn btn-ghost btn-block" style="margin-top:18px;"
        href="{{ url_for('login') }}">Back to log in</a>
 
   {% else %}
     {% if first_run %}
-      <p class="muted small" style="margin-bottom:18px;">
-        First account &mdash; this one owns the app, and any training already
-        logged becomes yours.
-      </p>
+      <p class="muted small" style="margin-bottom:18px;">First account &mdash; this one owns the app.</p>
     {% endif %}
 
     {% if error %}<p class="authnote error">{{ error }}</p>{% endif %}
